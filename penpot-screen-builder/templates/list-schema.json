@@ -1,0 +1,11 @@
+[
+  {
+    "_comment": "Template de schéma de liste — remplacer par vos données réelles",
+    "id": "USR-2847",
+    "name": "Jean Dupont",
+    "email": "jean.dupont@acme.fr",
+    "role": "admin",
+    "active": true,
+    "created_at": "2026-01-14"
+  }
+]

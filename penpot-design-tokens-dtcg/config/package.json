@@ -1,0 +1,22 @@
+{
+  "name": "penpot-design-tokens",
+  "version": "1.0.0",
+  "description": "Design tokens pipeline — Penpot → CSS + JS → Storybook",
+  "type": "module",
+  "scripts": {
+    "consolidate": "node scripts/consolidate.js ./tokens-export",
+    "build:tokens": "node config/style-dictionary.config.js",
+    "tokens": "npm run consolidate && npm run build:tokens",
+    "watch": "nodemon --watch tokens-export/ --ext json --exec 'npm run tokens'"
+  },
+  "dependencies": {
+    "style-dictionary": "^4.0.0",
+    "@tokens-studio/sd-transforms": "^1.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

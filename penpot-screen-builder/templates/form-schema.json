@@ -1,0 +1,12 @@
+{
+  "_comment": "Template de schéma de formulaire — remplacer par vos données réelles",
+  "id": "USR-2847",
+  "first_name": "Jean",
+  "last_name": "Dupont",
+  "email": "jean.dupont@acme.fr",
+  "phone": "+33 6 12 34 56 78",
+  "role": ["admin", "editor", "viewer"],
+  "department": "Design",
+  "active": true,
+  "created_at": "2026-01-14"
+}

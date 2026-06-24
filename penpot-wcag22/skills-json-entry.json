@@ -1,0 +1,12 @@
+{
+  "INSTRUCTIONS": "Copy the object below and add it to the 'skills' array in ~/.penpot-ai-kit/skills.json",
+  "entry": {
+    "id": "penpot-wcag22",
+    "name": "penpot-wcag22",
+    "version": "0.1.0",
+    "path": "skills/penpot-wcag22/SKILL.md",
+    "mode": "suggest",
+    "audiences": ["design-system", "product-designer", "design-engineer"],
+    "description": "WCAG 2.2 Level AA audit resource: contrast ratios, target sizes, focus indicators, and the 6 new 2.2 criteria. Grounds penpot-audit-accessibility in exact numeric thresholds."
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "_comment": "Corpus de contenu réaliste fr-FR — penpot-content-generator",
+  "person-name": [
+    "Jean Dupont", "Marie Leblanc", "Ahmed Benali", "Sophie Martin",
+    "Luc Girard", "Fatima Ndiaye", "Paul Rousseau", "Clara Bernard",
+    "Nicolas Petit", "Julie Thomas", "Omar Diallo", "Isabelle Moreau",
+    "Pierre Lambert", "Amina Koné", "François Mercier", "Léa Simon"
+  ],
+  "first-name": [
+    "Jean", "Marie", "Ahmed", "Sophie", "Luc", "Fatima",
+    "Paul", "Clara", "Nicolas", "Julie", "Omar", "Isabelle"
+  ],
+  "last-name": [
+    "Dupont", "Leblanc", "Benali", "Martin", "Girard", "Ndiaye",
+    "Rousseau", "Bernard", "Petit", "Thomas", "Diallo", "Moreau"
+  ],
+  "email": [
+    "jean.dupont@acme.fr", "marie.leblanc@entreprise.com",
+    "contact@societe.fr", "support@plateforme.io",
+    "admin@example.fr", "info@startup.co"
+  ],
+  "phone": [
+    "+33 6 12 34 56 78", "+33 1 42 00 11 22",
+    "+33 7 89 01 23 45", "+33 6 55 44 33 22"
+  ],
+  "address": [
+    "12 rue de la Paix, 75001 Paris",
+    "4 allée des Roses, 69003 Lyon",
+    "8 boulevard du Port, 13002 Marseille",
+    "23 avenue Foch, 33000 Bordeaux",
+    "15 place Bellecour, 69002 Lyon"
+  ],
+  "city": ["Paris", "Lyon", "Marseille", "Bordeaux", "Nantes",
+           "Toulouse", "Strasbourg", "Lille", "Rennes", "Nice"],
+  "company": [
+    "Acme SAS", "TechCorp SARL", "InnoDesign SA",
+    "DataFlow SAS", "CloudSuite SARL", "NovaTech SA"
+  ],
+  "role": [
+    "Designer Senior", "Chef de Projet", "Développeur Full Stack",
+    "Directrice Marketing", "Responsable Produit", "Analyste Business",
+    "Ingénieure DevOps", "Consultant Stratégie"
+  ],
+  "title": [
+    "Rapport trimestriel Q2 2026", "Tableau de bord commercial",
+    "Analyse des performances", "Synthèse mensuelle",
+    "Plan d'action 2026", "Bilan annuel"
+  ],
+  "description": [
+    "Solution complète pour optimiser vos processus métier.",
+    "Plateforme collaborative dédiée aux équipes design.",
+    "Outil de gestion avancé pour les professionnels.",
+    "Interface intuitive pour une expérience utilisateur optimale."
+  ],
+  "body": [
+    "Ce paragraphe présente le contenu principal de la section avec suffisamment de texte pour valider le layout sur deux lignes minimum.",
+    "Description complète qui illustre le comportement du composant avec un contenu représentatif de la production réelle.",
+    "Texte d'exemple réaliste permettant de valider l'affichage typographique et le respect des espacements définis dans le système."
+  ],
+  "price": ["1 249,00 €", "89,90 €", "3 500,00 €", "149,99 €", "29,00 €", "12 800,00 €"],
+  "date": ["14/06/2026", "01/01/2026", "31/12/2025", "15/03/2026", "30/09/2025"],
+  "time": ["14:30", "09:00", "17:45", "08:15", "12:00"],
+  "count": ["42", "128", "7", "2 847", "1 234"],
+  "percent": ["73 %", "12 %", "98 %", "45 %", "67 %"],
+  "id": ["USR-2847", "ORD-00124", "PRJ-456", "TKT-9901", "REF-7823"],
+  "label": ["En cours", "Terminé", "En attente", "Annulé", "Brouillon", "Validé"],
+  "status": ["Actif", "Inactif", "Suspendu", "En révision", "Archivé"],
+  "message": [
+    "Votre demande a bien été prise en compte.",
+    "Modifications enregistrées avec succès.",
+    "Une erreur est survenue, veuillez réessayer."
+  ],
+  "hint": [
+    "Saisissez votre adresse e-mail", "Entrez votre nom complet",
+    "Rechercher...", "JJ/MM/AAAA", "Sélectionnez une option"
+  ],
+  "action": ["Enregistrer", "Confirmer", "Annuler", "Suivant",
+             "Retour", "Créer", "Modifier", "Supprimer"],
+  "heading": ["Tableau de bord", "Mon compte", "Paramètres",
+              "Résultats", "Vue d'ensemble", "Détails"],
+  "nav": ["Accueil", "Projets", "Équipe", "Rapports",
+          "Paramètres", "Aide", "Notifications"],
+  "error": [
+    "Ce champ est obligatoire.",
+    "Format invalide.",
+    "La valeur doit être positive.",
+    "Email déjà utilisé."
+  ],
+  "success": [
+    "Modifications enregistrées.",
+    "Compte créé avec succès.",
+    "Fichier importé."
+  ],
+  "empty-state": [
+    "Aucun élément à afficher.",
+    "Aucun résultat pour cette recherche.",
+    "Commencez par créer un premier élément."
+  ]
+}
