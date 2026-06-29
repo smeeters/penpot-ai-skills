@@ -1,108 +1,181 @@
-# Anatomie de la librairie de référence — tokens2026.json
+# Token Architecture Rule — Astralan Design System
 
-> Analyse structurelle servant de contrat au workflow `penpot-token-pipeline`.
-> Format : Tokens Studio (`$themes`, `$metadata.tokenSetOrder`).
+**Version** : 1.0  
+**Scope** : Tout projet utilisant les tokens Astralan (Penpot, Style Dictionary,
+Storybook, ou tout autre outil de design/code)  
+**Statut** : Règle non négociable — s'applique à toute l'équipe
 
-## Vue d'ensemble
+---
 
-| Niveau | Sets | Tokens | Rôle |
-|--------|------|--------|------|
-| `01-Fondation` | 1 | 245 | Valeurs brutes — aucun alias |
-| `02-Semantic` | 1 | 274 | 100% alias vers Fondation, namespace `dark.*` |
-| `03-Component/**` | 55 | ~600 | Alias vers Semantic, par composant × résolution |
-| `$themes` | — | — | Combinaisons de sets par résolution |
+## 1. Principe
 
-## 01-Fondation — répartition des types
+Les tokens sont organisés en **3 niveaux hiérarchiques stricts**.
+Chaque niveau ne peut référencer que le niveau immédiatement inférieur.
+Aucun saut, aucune valeur littérale en dehors du niveau Fondation.
 
 ```
-color: 102        typography: 29     sizing: 34
-spacing: 20       dimension: 16      number: 12
-opacity: 10       borderRadius: 9    shadow: 8
-borderWidth: 4    fontFamilies: 1
+┌─────────────────────────────────────────────────────────┐
+│  03-Composants   tokens métier, par composant           │
+│  ex: accordion.bg, button.contained.bg.primary          │
+│                      │ référence uniquement             │
+├──────────────────────▼──────────────────────────────────┤
+│  02-Semantique   alias fonctionnels, rôles visuels      │
+│  ex: color.surface.panel, color.text.primary            │
+│                      │ référence uniquement             │
+├──────────────────────▼──────────────────────────────────┤
+│  01-Fondation    primitifs bruts, valeurs littérales    │
+│  ex: color.gray.600 = #252A31, spacing.16 = 16          │
+└─────────────────────────────────────────────────────────┘
 ```
 
-Groupes notables : `color.vert.*` (success), shades en pourcentages d'overlay
-(`190p-overlay`, `160p-base`, `12p`, `8p`…), styles typo complets (`h2`, `h3`,
-`body1`, `subtitle2`, `overline`, `helper-text`), groupes par usage
-(`table`, `chip`, `menu`, `alert`, `tooltip`, `avatar`, `input`).
+---
 
-## 02-Semantic — namespace `dark.*`
+## 2. Règles par niveau
 
-23 groupes sémantiques :
-```
-primary  secondary  success  warning  error  info        ← palettes d'intention
-text  background  action  divider  border  icon          ← rôles UI
-spacing  gap  padding  size  radius                      ← dimensionnel
-typography  opacity  motion  breakpoint  tooltip  other  ← divers
-```
+### 01-Fondation
+- **Contient** : valeurs littérales uniquement (hex, px, rem, nombres, chaînes)
+- **Peut référencer** : rien — toujours une valeur finale
+- **Ne peut pas** : référencer un autre token
 
-Pattern d'alias canonique :
 ```json
-"dark.success.main":   { "$value": "{color.vert.main}",   "$type": "color" }
-"dark.action.hover":   { "$value": "{color...}",          "$type": "color" }
-"dark.padding.button-sm.vertical": { "$value": "{spacing...}", "$type": "spacing" }
+// ✅ Correct
+"color.gray.600": { "$value": "#252A31", "$type": "color" }
+"spacing.16":     { "$value": "16",      "$type": "spacing" }
+"opacity.8":      { "$value": "0.08",    "$type": "opacity" }
+
+// ❌ Interdit
+"color.gray.600": { "$value": "{color.dark.base}", "$type": "color" }
 ```
 
-## 03-Component — double découpage
+### 02-Semantique
+- **Contient** : alias par rôle fonctionnel (surface, text, intent, border, icon, action…)
+- **Peut référencer** : tokens `01-Fondation` uniquement
+- **Ne peut pas** : contenir de valeur littérale, référencer `03-Composants`
 
-### `Base/<Name>` — états et structure (le gros du composant)
-Exemple `Base/Button` (~127 tokens) :
+```json
+// ✅ Correct
+"color.surface.panel":  { "$value": "{color.gray.600}", "$type": "color" }
+"color.text.primary":   { "$value": "{color.gray.50}",  "$type": "color" }
+"action.hover":         { "$value": "rgba(255,255,255,0.08)", "$type": "color" }
+// Note : rgba() = valeur littérale complexe → acceptable dans 02 si aucun
+// primitif de 01 ne peut l'exprimer (opacité calculée).
+
+// ❌ Interdit — valeur littérale directe
+"color.surface.panel": { "$value": "#252A31", "$type": "color" }
+
+// ❌ Interdit — référence vers 03-Composants
+"color.surface.panel": { "$value": "{accordion.bg}", "$type": "color" }
 ```
-button.icon.color.<variant>.<état>
-  variants : (défaut) | inherit | error | …
-  états    : enabled | hovered | focused | pressed | disabled
-button.container.bg.<état>
-button.container.border-radius
+
+### 03-Composants
+- **Contient** : tokens par composant et par propriété visuelle
+- **Peut référencer** : tokens `02-Semantique` uniquement
+- **Ne peut pas** : contenir de valeur littérale, référencer `01-Fondation`
+
+```json
+// ✅ Correct
+"accordion.bg":           { "$value": "{color.surface.panel}", "$type": "color" }
+"accordion.text":         { "$value": "{color.text.primary}",  "$type": "color" }
+"accordion.bg-hover":     { "$value": "{action.hover}",        "$type": "color" }
+"accordion.text-disabled":{ "$value": "{color.text.disabled}", "$type": "color" }
+
+// ❌ Interdit — saut de niveau (03 → 01)
+"accordion.bg": { "$value": "{color.gray.600}", "$type": "color" }
+
+// ❌ Interdit — valeur littérale dans 03
+"accordion.bg": { "$value": "#252A31", "$type": "color" }
 ```
-→ Tous les alias pointent vers `02-Semantic` (`{dark.error.main}`,
-`{dark.action.disabled}`…)
 
-### `<Size>/<Name>` — overrides dimensionnels uniquement (~6-7 tokens)
-Exemple `Small/Button` :
+---
+
+## 3. Convention de nommage
+
+### 01-Fondation
 ```
-small.button.size.height        → {dark.size.button.sm}
-small.button.padding.vertical   → {dark.padding.button-sm.vertical}
+[type].[famille].[échelle]
+color.gray.600
+color.blue.400
+spacing.16
+opacity.8
+border-radius.4
+font.size.14
+shadow.md
 ```
 
-### Sets singuliers (sans découpage par taille)
-`Dialog`, `Snackbar`, `Menu`, `Menu-Organism`, `Tab`, `Link`, `Tooltip`,
-`Multiline` — composants à résolution unique.
+### 02-Semantique
+```
+[type].[domaine].[rôle]
+color.surface.panel
+color.surface.card
+color.text.primary
+color.text.disabled
+color.intent.primary
+color.border.default
+color.icon.default
+action.hover
+action.selected
+size.button.md
+```
 
-## $themes — activation par résolution
+### 03-Composants
+```
+[composant].[élément].[propriété]-[état]
+accordion.bg
+accordion.bg-hover
+accordion.text-disabled
+accordion.icon
+button.contained.bg.primary
+button.contained.bg.primary-hover
+textfield.border-focus
+```
 
-| Thème | Groupe | Sets activés |
-|-------|--------|--------------|
-| `NG-small` | Resolution | 30 (Fondation + Semantic + tous les `Base/` + tous les `Small/`) |
-| `NG-Medium` | Resolution | 26 (idem avec `Medium/`) |
-| `Small/Medium/Large` | par composant (Button, Checkbox…) | 0 — groupes de switching fins |
+---
 
-**Implication workflow** : la résolution active détermine quel set `<Size>/`
-cibler. `NG-small` actif → les tokens dimensionnels vont dans `Small/<Name>`.
+## 4. Noms de sets Penpot (projet Astralan)
 
-## $metadata.tokenSetOrder
+| Niveau | Nom du set dans Penpot Tokens |
+|---|---|
+| Fondation | `01-Fondation` |
+| Sémantique | `02-Semantique` |
+| Composants | `03-Composants` |
 
-L'ordre de chargement est significatif : `01-Fondation` → `02-Semantic` →
-`03-Component/Base/*` → tailles. Toute création de set doit respecter
-cette position (les `Base/` avant les `Small|Medium|Large/`).
+L'ordre de chargement doit toujours être : `01-Fondation` → `02-Semantique`
+→ `03-Composants`. Ne jamais réorganiser cet ordre dans `$metadata.tokenSetOrder`.
 
-## Conventions extraites
+---
 
-| Élément | Convention | Exemple |
-|---------|-----------|---------|
-| Nom de set composant | PascalCase-avec-tirets | `Base/Header-Action-Button` |
-| Nom de token | kebab-case, hiérarchie par points | `button.container.border-radius` |
-| Préfixe taille | minuscule | `small.header-action-btn.size.height` |
-| États | 5 canoniques | `enabled hovered focused pressed disabled` |
-| Valeur transparente | littéral `"transparent"` | `drawer-btn.container.bg.default` |
+## 5. Procédure en cas de token manquant
 
-## ⚠️ Particularités à respecter
+Quand aucun token `03-Composants` approprié n'existe pour un composant :
 
-1. `bg.default` coexiste avec les états explicites (`bg.hovered`…) — `default`
-   est utilisé à la place d'`enabled` dans certains composants (Drawer-Header-Button).
-   Le workflow doit matcher les deux.
-2. Certains sets de taille n'overrident que `height` + `item-width` — ne pas
-   générer de tokens dimensionnels superflus.
-3. `Switch+` (`03-Component/Medium/Switch+`) contient un caractère spécial —
-   échapper dans les requêtes.
-4. La graphie est `01-Fondation` (français, sans le « u » de foundation) —
-   toute création de set doit reprendre cette graphie exacte.
+```
+1. Identifier le rôle visuel du fill/stroke/dimension manquant
+2. Vérifier si un token 02-Semantique correspond à ce rôle
+3. Si oui → créer le token 03-Composants qui le référence
+4. Si non → créer d'abord le token 02-Semantique (et vérifier 01-Fondation)
+5. Appliquer le token 03-Composants fraîchement créé
+6. Documenter l'ajout dans le changelog du set
+```
+
+Ne jamais sauter les étapes 3-4 pour gagner du temps.
+
+---
+
+## 6. Violations courantes et corrections
+
+| Violation | Correction |
+|---|---|
+| Token `02` appliqué directement sur un composant | Créer le token `03` correspondant |
+| Valeur hex en dur dans `03-Composants` | Créer le token `01` + `02` + router |
+| Token `01` référencé depuis `03` | Intercaler le token `02` manquant |
+| Deux composants différents partagent le même token `03` | Créer deux tokens `03` distincts (même valeur, noms différents) |
+
+---
+
+## 7. Référence croisée
+
+Ce fichier est référencé par :
+- `penpot-token-pipeline/WORKFLOW.md` — workflow de création/application
+- `penpot-token-pipeline/scripts/bootstrap-tokens.js` — génération automatique
+- `penpot-token-pipeline/scripts/apply-tokens.js` — vérification avant application
+- `~/.claude/CLAUDE.md` (optionnel, local) — règle globale Claude Code
