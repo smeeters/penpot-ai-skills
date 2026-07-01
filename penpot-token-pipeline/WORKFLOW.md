@@ -1,7 +1,7 @@
 ---
 id: penpot-token-pipeline
 name: penpot-token-pipeline
-version: 0.2.0
+version: 0.3.0
 mode: review
 audiences: ["design-system", "design-engineer"]
 description: >
@@ -222,6 +222,64 @@ Le matching élément se fait par nom de calque — si les calques ne sont pas
 nommés sémantiquement, **STOP** : proposer d'abord un passage de
 `penpot-rename-layers`.
 
+### B2bis — Garde-fous terrain (NON SKIPPABLES)
+
+Règles issues de sessions de production réelles. Les ignorer provoque des
+erreurs silencieuses, des doublons, et des heures de correction manuelle.
+Appliquer chaque point, dans l'ordre. Détails, causes et procédures de
+récupération : voir `references/apply-pitfalls.md`.
+
+**G1. Auditer `fills` ET `strokes` dès le départ**
+L'audit initial DOIT collecter les deux. Les bordures, contours (Outlined),
+underlines (Link) et séparateurs (ButtonGroup) sont des `strokes`, pas des
+`fills`. Un audit fills-only laisse la moitié du composant non tokenisé.
+
+**G2. Classifier par `shape.type` AVANT de choisir le token**
+- `text` → token texte (`*.text.*`)
+- `path` / `vector` → token icône (`*.icon.*`), JAMAIS un token texte
+- `board` sans fill (`fills: []`) → conteneur, ignorer (ne pas tokeniser le vide)
+
+Créer un token icône distinct du token texte même si la couleur est
+identique : le rôle sémantique diffère et divergera un jour.
+
+**G3. Garde-fou toggle — TOUJOURS vérifier avant d'appliquer**
+`applyToken` se comporte comme un TOGGLE : l'appeler sur un shape qui porte
+déjà ce token le RETIRE. Toujours :
+
+```js
+if (shape.tokens?.fill !== token.name) shape.applyToken(token, ['fill']);
+```
+
+Pour REMPLACER un token différent déjà présent, l'opération n'est pas
+garantie en un appel — vérifier en relecture et réappliquer si besoin.
+
+**G4. Boards → `applyToSelected`, pas `applyToken`**
+Sur un shape `type === 'board'`, `applyToken` et `applyToShapes` échouent
+SILENCIEUSEMENT. Seule méthode fiable :
+
+```js
+penpot.selection = [shape];
+token.applyToSelected(['fill']);   // prévoir un 2e appel pour lier réellement
+```
+
+**G5. Anti-doublon — chercher les permutations de segments avant CREATE**
+Avant de créer `button.contained.primary.bg`, chercher AUSSI les
+ré-ordonnancements : `button.contained.bg.primary`, etc. Un doublon à
+segments permutés ne lève aucune erreur et oblige à migrer tous les shapes
+ensuite. Réutiliser la nomenclature majoritaire déjà en place.
+
+**G6. Strokes = appel séparé**
+Les tokens de bordure s'appliquent via `shape.applyToken(token,
+['strokeColor'])`, distinct du fill. Un audit/application de fill ne couvre
+jamais les strokes.
+
+**G7. Chunk = 10 max, page par ID**
+- Max **10 shapes** par bloc `execute_code` (au-delà : timeout 30s).
+- Naviguer par **ID de page** via `openPage(id)`, JAMAIS par nom.
+  Re-vérifier `penpot.currentPage.name` après navigation.
+- Après un timeout : NE PAS réappliquer aveuglément. Auditer d'abord ce qui
+  est déjà lié (la passe a souvent réussi avant la coupure).
+
 **B3 — Application** (voir `scripts/apply-tokens.js`)
 ⚠️ Gotchas :
 - Appliquer uniquement des tokens `03-Composants` — jamais `02-Semantique`
@@ -411,6 +469,7 @@ Pour une sélection multiple (ex. les 5 variants d'état d'un Accordion) :
 - `scripts/apply-tokens.js` — binding tokens → propriétés
 - `references/token-architecture-rule.md` — règle des 3 niveaux (référence complète)
 - `references/tokens2026-architecture.md` — anatomie de la librairie de référence
+- `references/apply-pitfalls.md` — pièges APPLY confirmés terrain (débogage)
 
 ## 6. Références
 
